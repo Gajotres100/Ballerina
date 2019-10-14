@@ -25,16 +25,16 @@ service Kloc on new http:Listener(9090) {
         
         http:Request reqtaz = new;
 
-        req.setTextPayload("user=admin&password=Passw0rd");   
-        req.setPayload("user=admin&password=Passw0rd");   
-
         reqtaz.setHeader("referer", "https://ipa.ipa.lab/ipa");
         reqtaz.setHeader("Content-Type", "application/x-www-form-urlencoded");
         reqtaz.setHeader("Accept", "text/plain");                  
 
+        req.setTextPayload("user=admin&password=Passw0rd");   
+
         var response = clientEndpoint->post("/session/login_password", reqtaz);  
 
         if (response is http:Response) {
+            io:println(response);           
             string sessionCookie = response.getHeader("Set-Cookie");
             io:println("Set-Cookie: " + sessionCookie);           
 
@@ -42,8 +42,10 @@ service Kloc on new http:Listener(9090) {
         }        
 
         if (response is error) {
-            log:printError("Error sending response");
-            var result = caller->respond(<@untained> "Error");
+            http:Response res = new;
+            res.statusCode = 500;
+            res.setPayload(<@untainted> <string> response.reason());
+            var result = caller->respond(res);
         }
     }    
 
