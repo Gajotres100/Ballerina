@@ -1,5 +1,15 @@
 import ballerina/http;
 import ballerina/log;
+import ballerina/io;
+
+http:ClientConfiguration ipaConfig = {
+    followRedirects: { enabled: true, maxCount: 5 },
+    secureSocket: {
+        disable: true
+    }
+};
+
+http:Client clientEndpoint = new("https://ipa.ipa.lab/ipa", ipaConfig);
 
 @http:ServiceConfig {
     basePath: "/api/v1"
@@ -12,11 +22,28 @@ service Kloc on new http:Listener(9090) {
         path: "/user"
     }
     resource function CreateUser(http:Caller caller, http:Request req) {
+        
+        http:Request reqtaz = new;
 
-        var result = caller->respond("Hello, World!");
+        req.setTextPayload("user=admin&password=Passw0rd");   
+        req.setPayload("user=admin&password=Passw0rd");   
 
-        if (result is error) {
-            log:printError("Error sending response", result);
+        reqtaz.setHeader("referer", "https://ipa.ipa.lab/ipa");
+        reqtaz.setHeader("Content-Type", "application/x-www-form-urlencoded");
+        reqtaz.setHeader("Accept", "text/plain");                  
+
+        var response = clientEndpoint->post("/session/login_password", reqtaz);  
+
+        if (response is http:Response) {
+            string sessionCookie = response.getHeader("Set-Cookie");
+            io:println("Set-Cookie: " + sessionCookie);           
+
+            var result = caller->respond(<@untained> response);
+        }        
+
+        if (response is error) {
+            log:printError("Error sending response");
+            var result = caller->respond(<@untained> "Error");
         }
     }    
 
