@@ -18,7 +18,7 @@ service Kloc on new http:Listener(9090) {
         if (result is error) {
             log:printError("Error sending response", result);
         }
-    }
+    }    
 
     @http:ResourceConfig {
         methods: ["GET"],
