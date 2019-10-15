@@ -23,22 +23,23 @@ service Kloc on new http:Listener(9090) {
     }
     resource function CreateUser(http:Caller caller, http:Request req) {
         
-        http:Request reqtaz = new;
+        http:Request reqtaz = new;                        
+
+        reqtaz.setTextPayload("user=admin&password=Passw0rd");  
 
         reqtaz.setHeader("referer", "https://ipa.ipa.lab/ipa");
         reqtaz.setHeader("Content-Type", "application/x-www-form-urlencoded");
-        reqtaz.setHeader("Accept", "text/plain");                  
-
-        req.setTextPayload("user=admin&password=Passw0rd");   
+        reqtaz.setHeader("Accept", "text/plain"); 
 
         var response = clientEndpoint->post("/session/login_password", reqtaz);  
 
-        if (response is http:Response) {
+        if (response is http:Response) {            
             io:println(response);           
+            io:println(response.statusCode);   
             string sessionCookie = response.getHeader("Set-Cookie");
             io:println("Set-Cookie: " + sessionCookie);           
 
-            var result = caller->respond(<@untained> response);
+            var result = caller->respond(<@untained> sessionCookie);
         }        
 
         if (response is error) {
