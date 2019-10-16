@@ -1,5 +1,6 @@
 import ballerina/http;
 import ballerina/log;
+import ballerina/io;
 
 http:ClientConfiguration ipaConfig = {
     followRedirects: {enabled: true, maxCount: 5},
@@ -24,21 +25,8 @@ service Kloc on httpListener {
     }
     resource function CreateUser(http:Caller caller, http:Request req) {
         string sessionCookie = GetSessionCookie(caller);
-
-        var result = caller->respond(<@untained>sessionCookie);
-    }
-
-    @http:ResourceConfig {
-        methods: ["GET"],
-        path: "/user/{symbol}"
-    }
-    resource function DeleteUser(http:Caller caller, http:Request req, string symbol) {
-
-        var result = caller->respond(<@untained> ("Kloc, World!" + symbol));
-
-        if (result is error) {
-            log:printError("Error sending response", result);
-        }
+        boolean status = GroupAdd(caller, sessionCookie);
+        var result = caller->respond(<@untained>status);
     }
 }
 
@@ -58,6 +46,7 @@ function handleError(error? result) {
 
 
 function GetSessionCookie(http:Caller caller) returns @tainted string {
+
     http:Request reqtaz = new;
 
     reqtaz.setTextPayload("user=admin&password=Passw0rd");
@@ -71,7 +60,7 @@ function GetSessionCookie(http:Caller caller) returns @tainted string {
     string sessionCookie = "";
 
     if (response is http:Response) {
-        sessionCookie = response.getHeader("Set-Cookie");     
+        sessionCookie = response.getHeader("Set-Cookie");        
     }
 
     if (response is error) {
@@ -79,4 +68,51 @@ function GetSessionCookie(http:Caller caller) returns @tainted string {
     }
 
     return sessionCookie;
+}
+
+function GroupAdd(http:Caller caller, string cookie) returns @tainted boolean {   
+
+    boolean resoult = false;
+    http:Request reqtaz = new;
+
+    json jsonData = {
+        "id": 0,
+        "method": "group_add",
+        "params": [
+        [
+        "Klocna"
+        ],
+        {
+            "all": true,
+            "description": "Gajo je gospodin",
+            "external": false, 
+            "no_members": false, 
+            "nonposix": false, 
+            "raw": false, 
+            "version": "2.114"
+        }
+        ]
+    };    
+
+    reqtaz.setJsonPayload(jsonData);
+
+    reqtaz.setHeader("referer", "https://ipa.ipa.lab/ipa");
+    reqtaz.setHeader("Content-Type", "application/json");
+    reqtaz.setHeader("Accept", "application/json");
+    reqtaz.setHeader("Cookie", cookie);    
+
+    var response = clientEndpoint->post("/json", reqtaz);
+
+    if (response is error) {        
+        io:println(response);
+        sendErrorMsg(caller, response);
+        return false;
+    }
+
+    if (response is http:Response) {
+        io:println(response.statusCode);     
+        resoult = true;
+    }
+
+    return resoult;
 }
