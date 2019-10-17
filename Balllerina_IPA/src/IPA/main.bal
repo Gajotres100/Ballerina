@@ -26,7 +26,8 @@ service Kloc on httpListener {
     resource function CreateUser(http:Caller caller, http:Request req) {
         string sessionCookie = GetSessionCookie(caller);
         //boolean status = GroupAdd(caller, sessionCookie);
-        boolean status = UserAdd(caller, sessionCookie);
+        //boolean status = UserAdd(caller, sessionCookie);
+        boolean status = GroupAddMember(caller, sessionCookie);
         var result = caller->respond(<@untained>status);
     }
 }
@@ -146,6 +147,52 @@ function UserAdd(http:Caller caller, string cookie) returns @tainted boolean {
             "random": false,
             "raw": false,
             "sn": "Gaić",
+            "version": "2.114"
+        }
+        ]
+    };
+
+    reqtaz.setJsonPayload(jsonData);
+
+    reqtaz.setHeader("referer", "https://ipa.ipa.lab/ipa");
+    reqtaz.setHeader("Content-Type", "application/json");
+    reqtaz.setHeader("Accept", "application/json");
+    reqtaz.setHeader("Cookie", cookie);
+
+    var response = clientEndpoint->post("/json", reqtaz);
+
+    if (response is error) {
+        sendErrorMsg(caller, response);
+        return false;
+    }
+
+    if (response is http:Response) {
+        io:println(response.statusCode);
+        resoult = true;
+    }
+
+    return resoult;
+}
+
+function GroupAddMember(http:Caller caller, string cookie) returns @tainted boolean {
+
+    boolean resoult = false;
+    http:Request reqtaz = new;
+
+    json jsonData = {
+        "id": 0,
+        "method": "group_add_member",
+        "params": [
+        [
+        "klocna"
+        ],
+        {
+            "all": false,
+            "no_members": false,
+            "raw": false,
+            "user": [
+            "nikola"
+            ],
             "version": "2.114"
         }
         ]
