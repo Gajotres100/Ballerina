@@ -1,6 +1,6 @@
 import ballerina/http;
-import ballerina/log;
 import ballerina/io;
+import ballerina/log;
 
 http:ClientConfiguration ipaConfig = {
     followRedirects: {enabled: true, maxCount: 5},
@@ -25,7 +25,8 @@ service Kloc on httpListener {
     }
     resource function CreateUser(http:Caller caller, http:Request req) {
         string sessionCookie = GetSessionCookie(caller);
-        boolean status = GroupAdd(caller, sessionCookie);
+        //boolean status = GroupAdd(caller, sessionCookie);
+        boolean status = UserAdd(caller, sessionCookie);
         var result = caller->respond(<@untained>status);
     }
 }
@@ -60,7 +61,7 @@ function GetSessionCookie(http:Caller caller) returns @tainted string {
     string sessionCookie = "";
 
     if (response is http:Response) {
-        sessionCookie = response.getHeader("Set-Cookie");        
+        sessionCookie = response.getHeader("Set-Cookie");
     }
 
     if (response is error) {
@@ -70,7 +71,7 @@ function GetSessionCookie(http:Caller caller) returns @tainted string {
     return sessionCookie;
 }
 
-function GroupAdd(http:Caller caller, string cookie) returns @tainted boolean {   
+function GroupAdd(http:Caller caller, string cookie) returns @tainted boolean {
 
     boolean resoult = false;
     http:Request reqtaz = new;
@@ -85,32 +86,87 @@ function GroupAdd(http:Caller caller, string cookie) returns @tainted boolean {
         {
             "all": true,
             "description": "Gajo je gospodin",
-            "external": false, 
-            "no_members": false, 
-            "nonposix": false, 
-            "raw": false, 
+            "external": false,
+            "no_members": false,
+            "nonposix": false,
+            "raw": false,
             "version": "2.114"
         }
         ]
-    };    
+    };
 
     reqtaz.setJsonPayload(jsonData);
 
     reqtaz.setHeader("referer", "https://ipa.ipa.lab/ipa");
     reqtaz.setHeader("Content-Type", "application/json");
     reqtaz.setHeader("Accept", "application/json");
-    reqtaz.setHeader("Cookie", cookie);    
+    reqtaz.setHeader("Cookie", cookie);
 
     var response = clientEndpoint->post("/json", reqtaz);
 
-    if (response is error) {        
+    if (response is error) {
         io:println(response);
         sendErrorMsg(caller, response);
         return false;
     }
 
     if (response is http:Response) {
-        io:println(response.statusCode);     
+        io:println(response.statusCode);
+        resoult = true;
+    }
+
+    return resoult;
+}
+
+function UserAdd(http:Caller caller, string cookie) returns @tainted boolean {
+
+    boolean resoult = false;
+    http:Request reqtaz = new;
+
+    json jsonData = {
+        "id": 0,
+        "method": "user_add",
+        "params": [
+        [
+        "Nikola"
+        ],
+        {
+            "all": false,
+            "cn": "Nikola Gaić",
+            "displayname": "Nikola Gaić",
+            "gecos": "Nikola Gaić",
+            "givenname": "Nikola",
+            "initials": "NG",
+            "krbprincipalname": "klocna@IPA.LAB",
+            "mail": [
+            "nikola.gaic@gmail.com"
+            ],
+            "no_members": false,
+            "noprivate": false,
+            "random": false,
+            "raw": false,
+            "sn": "Gaić",
+            "version": "2.114"
+        }
+        ]
+    };
+
+    reqtaz.setJsonPayload(jsonData);
+
+    reqtaz.setHeader("referer", "https://ipa.ipa.lab/ipa");
+    reqtaz.setHeader("Content-Type", "application/json");
+    reqtaz.setHeader("Accept", "application/json");
+    reqtaz.setHeader("Cookie", cookie);
+
+    var response = clientEndpoint->post("/json", reqtaz);
+
+    if (response is error) {
+        sendErrorMsg(caller, response);
+        return false;
+    }
+
+    if (response is http:Response) {
+        io:println(response.statusCode);
         resoult = true;
     }
 

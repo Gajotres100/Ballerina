@@ -62,3 +62,39 @@ java.lang.IllegalStateException: illegal function invocation
 	at org.ballerinalang.jvm.scheduling.Scheduler.runSafely(Scheduler.java:208)
 	at java.lang.Thread.run(Thread.java:748)
  
+[2019-10-16 15:09:25,176] SEVERE {b7a.log.crash} - illegal function invocation 
+java.lang.IllegalStateException: illegal function invocation
+	at org.ballerinalang.net.http.HttpUtil.methodInvocationCheck(HttpUtil.java:1030)
+	at org.ballerinalang.net.http.HttpUtil.checkFunctionValidity(HttpUtil.java:1025)
+	at org.ballerinalang.net.http.nativeimpl.connection.Respond.nativeRespond(Respond.java:82)
+	at ballerina.http.http_connection.nativeRespond(http_connection.bal:167)
+	at ballerina.http.$value$Caller.respond(http_connection.bal:54)
+	at ballerina.http.$value$Caller.call(http_connection.bal)
+	at apisit.IPA.main.sendErrorMsg(main.bal:37)
+	at apisit.IPA.main.GroupAdd(main.bal:108)
+	at apisit.IPA.$value$Kloc__service_0.CreateUser(main.bal:28)
+	at apisit.IPA.$value$Kloc__service_0.call(main.bal)
+	at org.ballerinalang.jvm.values.connector.Executor.lambda$submit$0(Executor.java:71)
+	at org.ballerinalang.jvm.scheduling.SchedulerItem.execute(Scheduler.java:496)
+	at org.ballerinalang.jvm.scheduling.Scheduler.run(Scheduler.java:238)
+	at org.ballerinalang.jvm.scheduling.Scheduler.runSafely(Scheduler.java:208)
+	at java.lang.Thread.run(Thread.java:748)
+ 
+[2019-10-16 15:09:25,193] SEVERE {b7a.log.crash} - illegal function invocation 
+java.lang.IllegalStateException: illegal function invocation
+	at org.ballerinalang.net.http.HttpUtil.methodInvocationCheck(HttpUtil.java:1030)
+	at org.ballerinalang.net.http.HttpUtil.checkFunctionValidity(HttpUtil.java:1025)
+	at org.ballerinalang.net.http.nativeimpl.connection.Respond.nativeRespond(Respond.java:82)
+	at ballerina.http.http_connection.nativeRespond(http_connection.bal:167)
+	at ballerina.http.$value$Caller.respond(http_connection.bal:54)
+	at ballerina.http.$value$Caller.call(http_connection.bal)
+	at apisit.IPA.main.sendErrorMsg(main.bal:37)
+	at apisit.IPA.main.GroupAdd(main.bal:108)
+	at apisit.IPA.$value$Kloc__service_0.CreateUser(main.bal:28)
+	at apisit.IPA.$value$Kloc__service_0.call(main.bal)
+	at org.ballerinalang.jvm.values.connector.Executor.lambda$submit$0(Executor.java:71)
+	at org.ballerinalang.jvm.scheduling.SchedulerItem.execute(Scheduler.java:496)
+	at org.ballerinalang.jvm.scheduling.Scheduler.run(Scheduler.java:238)
+	at org.ballerinalang.jvm.scheduling.Scheduler.runSafely(Scheduler.java:208)
+	at java.lang.Thread.run(Thread.java:748)
+ 
